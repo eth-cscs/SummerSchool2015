@@ -25,4 +25,6 @@ main
 *.lst
 *.cub
 *.ptx
+*.MOD
+*.mod
 

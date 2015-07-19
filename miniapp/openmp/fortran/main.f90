@@ -22,7 +22,7 @@ program diffusion_serial
     implicit none
 
     ! variables
-    integer :: nx, ny, nt, N, num_threads
+    integer :: nx, ny, nt, N
 
     real (kind=8), allocatable :: b(:), deltax(:)
     real (kind=8) :: timespent, time_in_bcs, time_in_diff, time_in_other
@@ -52,10 +52,9 @@ program diffusion_serial
 
     ! ****************** setup compute domain ******************
 
-    num_threads = omp_get_max_threads()
     write(*,'(A)') '========================================================================'
     print *,       '                      Welcome to mini-stencil!'
-    print *, 'version :: Fortran90 OpenMP : ', num_threads, ' threads'
+    print *, 'version :: Serial Fortran90'
     print *, 'mesh    :: ', nx, '*', ny, '    dx =', options%dx
     print *, 'time    :: ', nt, 'time steps from 0 .. ', options%nt*options%dt
     write(*,'(A)') '========================================================================'

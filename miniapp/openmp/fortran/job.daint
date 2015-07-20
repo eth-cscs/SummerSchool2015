@@ -2,7 +2,8 @@
 
 #SBATCH --job-name="summer-school-serial"
 #SBATCH --nodes=1
-#SBATCH --output=job.out
+#SBATCH --output=job%j.out
+#SBATCH --reservation=summerschool
 #SBATCH --time=00:02:00
 
 aprun ./main 256 256 200 0.01

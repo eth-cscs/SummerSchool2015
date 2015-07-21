@@ -37,6 +37,7 @@ program diffusion_serial
     integer :: iseed(80), nseed
     integer :: flops_total
     integer :: output
+    integer :: reclen
 
     logical :: converged, cg_converged
     logical :: verbose_output
@@ -162,9 +163,14 @@ program diffusion_serial
     ! write final solution to BOV file for visualization
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     ! binary data
+
+
     output=20
-    open(unit=output, file='output.bin', status='replace', form='unformatted')
-    write(output) x_new
+
+
+    INQUIRE(iolength=reclen) x_new
+    open(unit=output, file='output.bin', status='replace', form='unformatted',ACCESS = 'DIRECT',RECL=reclen)                               
+    write(output,REC=1) x_new
     close(output)
     ! metadata
     open (unit=output, file='output.bov', status='replace')

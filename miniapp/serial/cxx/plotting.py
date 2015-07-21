@@ -34,4 +34,4 @@ C=pl.contour(X, Y, data.reshape(res_x, res_y), N, colors='black', linewidth=.5)
 
 pl.clabel(C, inline=1)
 pl.savefig("output.png", dpi=72)
-pl.show()
+#pl.show()

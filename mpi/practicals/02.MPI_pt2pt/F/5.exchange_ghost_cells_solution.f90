@@ -58,26 +58,36 @@ PROGRAM ghost_cell_exchange
     END DO
   END DO
 
-  rank_right = 0 !find the rank of my right neighbour
-  rank_left = 0 !find the rank of my left neighbour
+  rank_right=mod(rank+4,16)
+  rank_left=mod(rank+16-4,16)
 
   !  ghost cell exchange with the neighbouring cells on the left and on the right
   !  a) MPI_Send, MPI_Irecv
   !  b) MPI_Isend, MPI_Recv
   !  c) MPI_Sendrecv
   !  to the left
+
   ! a)
-
+  CALL MPI_Irecv(data(2,DOMAINSIZE), SUBDOMAIN, MPI_DOUBLE, rank_right, 0, MPI_COMM_WORLD, request, ierror)
+  CALL MPI_Send(data(2,2), SUBDOMAIN, MPI_DOUBLE, rank_left, 0, MPI_COMM_WORLD, ierror)
+  CALL MPI_Wait(request, status, ierror)
   ! b)
-
+  CALL MPI_Isend(data(2,2), SUBDOMAIN, MPI_DOUBLE, rank_left, 0, MPI_COMM_WORLD, request, ierror)
+  CALL MPI_Recv(data(2,DOMAINSIZE), SUBDOMAIN, MPI_DOUBLE, rank_right, 0, MPI_COMM_WORLD, status, ierror)
+  CALL MPI_Wait(request, status, ierror)
   ! c)
-
+  CALL MPI_Sendrecv(data(2,2), SUBDOMAIN, MPI_DOUBLE, rank_left, 0, data(2,DOMAINSIZE), SUBDOMAIN, MPI_DOUBLE, rank_right, 0, MPI_COMM_WORLD, status, ierror)
   !  to the right
   ! a)
-
+  CALL MPI_Irecv(data(2,1), SUBDOMAIN, MPI_DOUBLE, rank_left, 0, MPI_COMM_WORLD, request, ierror)
+  CALL MPI_Send(data(2,DOMAINSIZE-1), SUBDOMAIN, MPI_DOUBLE, rank_right, 0, MPI_COMM_WORLD, ierror)
+  CALL MPI_Wait(request, status, ierror);
   ! b)
-
+  CALL MPI_Isend(data(2,DOMAINSIZE-1), SUBDOMAIN, MPI_DOUBLE, rank_right, 0, MPI_COMM_WORLD, request, ierror)
+  CALL MPI_Recv(data(2,1), SUBDOMAIN, MPI_DOUBLE, rank_left, 0, MPI_COMM_WORLD, status, ierror)
+  CALL MPI_Wait(request, status, ierror);
   ! c)
+  CALL MPI_Sendrecv(data(2,DOMAINSIZE-1), SUBDOMAIN, MPI_DOUBLE, rank_right, 0, data(2,1), SUBDOMAIN, MPI_DOUBLE, rank_left, 0, MPI_COMM_WORLD, status, ierror)
 
   IF (rank.EQ.9) THEN
      WRITE (*,*) 'data of rank 9 after communication'

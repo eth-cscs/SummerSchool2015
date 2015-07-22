@@ -13,9 +13,10 @@
  *                                                              *
  ****************************************************************/
 
-/* There is two bugs in this application.
+/* There are three bugs in this application.
  * If compiled with cray compiler and ran with 4 ranks the program works
  * If 16 ranks are used the program fails (easy to find)
+ * one bug is hidden and will not make the program fails (easy to find)
  * If compiled with Intel compiler, the program fails (hard to find)
  * DO NOT TRY TO FIX THE BUGS - YOU JUST HAVE TO IDENTIFY THEM
  */

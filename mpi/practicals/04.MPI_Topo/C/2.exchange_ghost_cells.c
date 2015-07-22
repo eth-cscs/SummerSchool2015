@@ -14,7 +14,7 @@
  ****************************************************************/
 
 /* Use only 16 processes for this exercise
- * Send the ghost cell in two directions: left to right and right to left
+ * Send the ghost cell in all directions
  *
  * process decomposition on 4*4 grid
  *

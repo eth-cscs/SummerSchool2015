@@ -1,3 +1,5 @@
+// TODO : update reduction operations
+
 // linear algebra subroutines
 // Ben Cumming @ CSCS
 
@@ -55,16 +57,13 @@ void cg_init(int nx, int ny)
 double ss_dot(Field const& x, Field const& y)
 {
     double result = 0;
-    double result_global = 0;
     int N = y.length();
 
     #pragma omp parallel for reduction(+:result)
     for (int i = 0; i < N; i++)
         result += x[i] * y[i];
 
-    MPI_Allreduce(&result, &result_global, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-
-    return result_global;
+    return result;
 }
 
 // computes the 2-norm of x
@@ -72,16 +71,13 @@ double ss_dot(Field const& x, Field const& y)
 double ss_norm2(Field const& x)
 {
     double result = 0;
-    double result_global = 0;
     int N = x.length();
 
     #pragma omp parallel for reduction(+:result)
     for (int i = 0; i < N; i++)
         result += x[i] * x[i];
 
-    MPI_Allreduce(&result, &result_global, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-
-    return sqrt(result_global);
+    return result;
 }
 
 // sets entries in a vector to value

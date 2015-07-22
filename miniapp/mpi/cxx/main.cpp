@@ -1,3 +1,6 @@
+// TODO : initialize MPI and get rank & size
+// TODO : MPI finalize
+
 // ******************************************
 // implicit time stepping implementation of 2D diffusion problem
 // Ben Cumming, CSCS
@@ -137,12 +140,6 @@ int main(int argc, char* argv[])
     // initialize MPI
     int mpi_rank, mpi_size;
     int thread_level;
-    if( MPI_Init_thread(&argc, &argv, MPI_THREAD_FUNNELED, &thread_level) != MPI_SUCCESS ) {
-        std::cerr << "unable to initialize MPI :: exitting" << std::endl;
-        exit(-1);
-    }
-    MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
-    MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
 
     // initialize subdomain
     domain.init(mpi_rank, mpi_size, options);

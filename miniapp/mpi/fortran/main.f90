@@ -1,3 +1,8 @@
+! TODO : initialize MPI and get rank & size
+! TODO : and MPI finalize
+! TODO : create cartesian topology
+
+
 !******************************************
 ! implicit time stepping implementation of 2D diffusion problem
 ! Ben Cumming, CSCS
@@ -196,8 +201,6 @@ program diffusion_serial
     deallocate(x_new, x_old)
     deallocate(bndN, bndS, bndE, bndW)
 
-    call mpi_finalize(err)
-
 contains
 
 !==============================================================================
@@ -308,32 +311,30 @@ subroutine initialize_mpi(options, domain)
     integer     :: comm_cart
     integer     :: thread_level
 
-    call mpi_init_thread(MPI_THREAD_FUNNELED, thread_level, err)
-    call mpi_comm_size(MPI_COMM_WORLD, mpi_size, ierr)
-    call mpi_comm_rank(MPI_COMM_WORLD, mpi_rank, ierr)
-
     ! compute the domain decomposition size
     ! ndomx and ndomy are the number of sub-domains in the x and y directions
     ! repsectively
     dims(1) = 0
     dims(2) = 0
-    call mpi_dims_create(mpi_size, 2, dims, ierr)
+
     ndomy = dims(1)
     ndomx = dims(2)
 
     ! create a 2D non-periodic cartesian topology
     periods(1) = 0
     periods(2) = 0
-    call mpi_cart_create(MPI_COMM_WORLD, 2, dims, periods, 0, comm_cart, ierr)
+
 
     ! retrieve coordinates of the rank in the topology
-    call mpi_cart_coords(comm_cart, mpi_rank, 2, coords, ierr)
+
     domy = coords(1)+1
     domx = coords(2)+1
 
     ! set neighbours for all directions
-    call mpi_cart_shift(comm_cart, 0, 1, domain%neighbour_south, domain%neighbour_north, ierr)
-    call mpi_cart_shift(comm_cart, 1, 1, domain%neighbour_west, domain%neighbour_east, ierr)
+    ! i.e. domain%neighbour_south
+    !      domain%neighbour_north
+    !      domain%neighbour_east
+    !      domain%neighbour_west
 
     ! get bounding box
     nx = options%global_nx / ndomx

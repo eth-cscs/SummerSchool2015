@@ -1,3 +1,5 @@
+! TODO : update reduction operations
+
 ! linear algebra subroutines
 ! Ben Cumming @ CSCS
 
@@ -42,7 +44,7 @@ real (kind=8) function ss_dot(x, y, N)
 
     ! local variables
     integer       :: i, err
-    real (kind=8) :: acc, accglobal
+    real (kind=8) :: acc
 
     ! the logic
     acc = 0
@@ -52,11 +54,7 @@ real (kind=8) function ss_dot(x, y, N)
     enddo
     !$omp end parallel do
 
-    call mpi_allreduce(acc, accglobal, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD, err)
-    ss_dot = accglobal
-
-    ! record the number of floating point oporations
-    flops_blas1 = flops_blas1 + 2*N
+    ss_dot = acc
 
     return
 end
@@ -70,7 +68,7 @@ real (kind=8) function ss_norm2(x, N)
 
     ! local variables
     integer       :: i, err
-    real (kind=8) :: acc, accglobal
+    real (kind=8) :: acc
 
     ! the logic
     acc = 0
@@ -79,10 +77,7 @@ real (kind=8) function ss_norm2(x, N)
         acc = acc + x(i) * x(i)
     enddo
     !$omp end parallel do
-    call mpi_allreduce(acc, accglobal, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD, err)
-    ss_norm2 = sqrt(accglobal)
-
-    flops_blas1 = flops_blas1 + 2*N
+    ss_norm2 = sqrt(acc)
 
     return
 end

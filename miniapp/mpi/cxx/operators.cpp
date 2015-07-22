@@ -1,3 +1,5 @@
+// TODO : halo exchange
+
 //******************************************
 // operators.cpp
 // based on min-app code written by Oliver Fuhrer, MeteoSwiss
@@ -40,73 +42,8 @@ void diffusion(const data::Field &U, data::Field &S)
     int iend  = nx - 1;
     int jend  = ny - 1;
 
-    MPI_Status statuses[8];
-    MPI_Request requests[8];
-    int num_requests = 0;
-
     if(domain.neighbour_north>=0) {
-        // set tag to be the sender's rank
-        // post receive
-        MPI_Irecv(&bndN[0], nx, MPI_DOUBLE, domain.neighbour_north, domain.neighbour_north,
-            MPI_COMM_WORLD, requests+num_requests);
-        num_requests++;
-
-        // pack north buffer
-        for(int i=0; i<nx; i++)
-            buffN[i] = U(i,ny-1);
-
-        // post send
-        MPI_Isend(&buffN[0], nx, MPI_DOUBLE, domain.neighbour_north, domain.rank,
-            MPI_COMM_WORLD, requests+num_requests);
-        num_requests++;
-    }
-    if(domain.neighbour_south>=0) {
-        // set tag to be the sender's rank
-        // post receive
-        MPI_Irecv(&bndS[0], nx, MPI_DOUBLE, domain.neighbour_south, domain.neighbour_south,
-            MPI_COMM_WORLD, requests+num_requests);
-        num_requests++;
-
-        // pack south buffer
-        for(int i=0; i<nx; i++)
-            buffS[i] = U(i,0);
-
-        // post send
-        MPI_Isend(&buffS[0], nx, MPI_DOUBLE, domain.neighbour_south, domain.rank,
-            MPI_COMM_WORLD, requests+num_requests);
-        num_requests++;
-    }
-    if(domain.neighbour_east>=0) {
-        // set tag to be the sender's rank
-        // post receive
-        MPI_Irecv(&bndE[0], ny, MPI_DOUBLE, domain.neighbour_east, domain.neighbour_east,
-            MPI_COMM_WORLD, requests+num_requests);
-        num_requests++;
-
-        // pack north buffer
-        for(int j=0; j<ny; j++)
-            buffE[j] = U(nx-1,j);
-
-        // post send
-        MPI_Isend(&buffE[0], ny, MPI_DOUBLE, domain.neighbour_east, domain.rank,
-            MPI_COMM_WORLD, requests+num_requests);
-        num_requests++;
-    }
-    if(domain.neighbour_west>=0) {
-        // set tag to be the sender's rank
-        // post receive
-        MPI_Irecv(&bndW[0], ny, MPI_DOUBLE, domain.neighbour_west, domain.neighbour_west,
-            MPI_COMM_WORLD, requests+num_requests);
-        num_requests++;
-
-        // pack north buffer
-        for(int j=0; j<ny; j++)
-            buffW[j] = U(0,j);
-
-        // post send
-        MPI_Isend(&buffW[0], ny, MPI_DOUBLE, domain.neighbour_west, domain.rank,
-            MPI_COMM_WORLD, requests+num_requests);
-        num_requests++;
+        // ...
     }
 
     // the interior grid points
@@ -120,9 +57,6 @@ void diffusion(const data::Field &U, data::Field &S)
                                     + dxs * U(i,j) * (1.0 - U(i,j));
         }
     }
-
-    // wait on the receives
-    MPI_Waitall(num_requests, requests, statuses);
 
     // the east boundary
     {

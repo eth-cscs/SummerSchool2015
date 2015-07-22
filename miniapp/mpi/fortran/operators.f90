@@ -1,3 +1,5 @@
+! TODO : halo exchange
+
 !******************************************
 ! operators.f90
 ! based on min-app code written by Oliver Fuhrer, MeteoSwiss
@@ -27,8 +29,6 @@ subroutine diffusion(u, s)
     real (kind=8) :: alpha, dxs
     integer :: i, j
     integer :: iend, jend, nx, ny
-    integer :: stats(MPI_STATUS_SIZE,8)
-    integer :: requests(8)
     integer :: num_requests, err
 
     dxs   = 1000.*(options%dx ** 2)
@@ -41,63 +41,8 @@ subroutine diffusion(u, s)
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     ! do the boundary exchange
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    num_requests = 0
     if (domain%neighbour_north>=0) then
-        ! set tag to be the sender's rank
-        ! post receive
-        call mpi_irecv(bndN, nx, MPI_DOUBLE, domain%neighbour_north, domain%neighbour_north, &
-            MPI_COMM_WORLD, requests(num_requests+1), err)
-
-        ! pack north buffer
-        buffN = u(:,ny)
-
-        ! post send
-        call mpi_isend(buffN, nx, MPI_DOUBLE, domain%neighbour_north, domain%rank, &
-            MPI_COMM_WORLD, requests(num_requests+2), err)
-
-        num_requests = num_requests + 2
-    endif
-    if (domain%neighbour_south>=0) then
-        ! post receive
-        call mpi_irecv(bndS, nx, MPI_DOUBLE, domain%neighbour_south, domain%neighbour_south, &
-            MPI_COMM_WORLD, requests(num_requests+1), err)
-
-        ! pack north buffer
-        buffS = u(:,1)
-
-        ! post send
-        call mpi_isend(buffS, nx, MPI_DOUBLE, domain%neighbour_south, domain%rank, &
-            MPI_COMM_WORLD, requests(num_requests+2), err)
-
-        num_requests = num_requests + 2
-    endif
-    if (domain%neighbour_east>=0) then
-        ! post receive
-        call mpi_irecv(bndE, ny, MPI_DOUBLE, domain%neighbour_east, domain%neighbour_east, &
-            MPI_COMM_WORLD, requests(num_requests+1), err)
-
-        ! pack north buffer
-        buffE = u(nx,:)
-
-        ! post send
-        call mpi_isend(buffE, ny, MPI_DOUBLE, domain%neighbour_east, domain%rank, &
-            MPI_COMM_WORLD, requests(num_requests+2), err)
-
-        num_requests = num_requests + 2
-    endif
-    if (domain%neighbour_west>=0) then
-        ! post receive
-        call mpi_irecv(bndW, ny, MPI_DOUBLE, domain%neighbour_west, domain%neighbour_west, &
-            MPI_COMM_WORLD, requests(num_requests+1), err)
-
-        ! pack north buffer
-        buffW = u(1,:)
-
-        ! post send
-        call mpi_isend(buffW, ny, MPI_DOUBLE, domain%neighbour_west, domain%rank, &
-            MPI_COMM_WORLD, requests(num_requests+2), err)
-
-        num_requests = num_requests + 2
+        ! ...
     endif
 
     ! the interior grid points
@@ -112,9 +57,6 @@ subroutine diffusion(u, s)
         end do
     end do
     !$omp end parallel do
-
-    ! wait on the receives
-    call mpi_waitall(num_requests, requests, stats, err)
 
     ! the east boundary
     i = options%nx

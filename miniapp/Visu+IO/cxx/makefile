@@ -1,5 +1,7 @@
 # module swap PrgEnv-cray PrgEnv-gnu
 # module load visit/2.9
+# module rm ddt
+# module swap gcc gcc/4.9.2
 # make clean; make
 CXX=CC
 

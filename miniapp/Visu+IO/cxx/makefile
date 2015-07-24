@@ -1,4 +1,7 @@
-CXX=mpic++
+# module swap PrgEnv-cray PrgEnv-gnu
+# module load visit/2.9
+# make clean; make
+CXX=CC
 
 CXXFLAGS=-O3 -fopenmp
 CXXFLAGS=-g  -fopenmp -D_VISIT_ -I${VISITHOME}/current/linux-x86_64/libsim/V2/include

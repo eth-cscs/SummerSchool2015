@@ -9,7 +9,7 @@ OBJ     = stats.o   data.o   operators.o   linalg.o
 
 .SUFFIXES: .cpp
 
-all: main tests
+all: main unit_tests
 
 stats.o: stats.cu $(HEADERS)
 	$(CUDA) $(CUDAFLAGS) -c stats.cu
@@ -26,18 +26,19 @@ linalg.o: linalg.cu $(HEADERS)
 main.o: main.cu $(HEADERS)
 	$(CUDA) $(CUDAFLAGS) -c main.cu
 
-tests.o: tests.cu $(HEADERS)
-	$(CUDA) $(CUDAFLAGS) -c tests.cu
+unit_tests.o: unit_tests.cu $(HEADERS)
+	$(CUDA) $(CUDAFLAGS) -c unit_tests.cu
 
 main: $(OBJ) main.o
 	$(CC) $(CXXFLAGS) $(OBJ) main.o -o main -lcublas
 
-tests: data.o linalg.o tests.o
-	$(CC) $(CXXFLAGS) tests.o $(OBJ) -o tests -lcublas
+unit_tests: data.o linalg.o unit_tests.o
+	$(CC) $(CXXFLAGS) unit_tests.o $(OBJ) -o unit_tests -lcublas
 	aprun ./tests
 
 clean:
 	rm -f main
+	rm -f unit_tests
 	rm -f *.o
 	rm -f *.i
 	rm -f output.*

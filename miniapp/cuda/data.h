@@ -113,26 +113,13 @@ class Field {
     /////////////////////////////////////////////////
     // helpers for coordinating host-device transfers
     /////////////////////////////////////////////////
+    // TODO : implement the body of update_host() and update_device()
     void update_host() {
-        cuda_check_status(
-            cudaMemcpy(
-                host_ptr_,
-                device_ptr_,
-                xdim_*ydim_*sizeof(double),
-                cudaMemcpyDeviceToHost
-            )
-        );
+        // ...
     }
 
     void update_device() {
-        cuda_check_status(
-            cudaMemcpy(
-                device_ptr_,
-                host_ptr_,
-                xdim_*ydim_*sizeof(double),
-                cudaMemcpyHostToDevice
-            )
-        );
+        // ...
     }
 
     private:

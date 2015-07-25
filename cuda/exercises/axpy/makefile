@@ -3,7 +3,7 @@ GCC_FLAGS=-std=c++11 -O3
 
 LINK=-lcublas -lcuda
 
-CUDA_BENCHMARKS= axpy_cublas.cuda axpy_kernel.cuda
+CUDA_BENCHMARKS= axpy_cublas.cuda axpy_kernel.cuda newton.cuda
 OPENMP_BENCHMARKS= axpy.omp
 
 BENCHMARKS=$(CUDA_BENCHMARKS) $(OPENMP_BENCHMARKS)
@@ -15,6 +15,9 @@ axpy_cublas.cuda : axpy_cublas.cu util.h
 
 axpy_kernel.cuda : axpy_kernel.cu util.h
 	nvcc $(NVCC_FLAGS) axpy_kernel.cu -o axpy_kernel.cuda $(LINK)
+
+newton.cuda : newton.cu util.h
+	nvcc $(NVCC_FLAGS) newton.cu -o newton.cuda $(LINK)
 
 axpy.omp : axpy_omp.cpp
 	g++ $(GCC_FLAGS) axpy_omp.cpp -o axpy.omp

@@ -117,23 +117,22 @@ int main(int argc, char** argv) {
         // exchange with south
         if(south>=0) {
             // x0(:, 0)    <- south
-            // x0(:, 1)    -> south
             MPI_Irecv(x0,    nx, MPI_DOUBLE, south, 0, MPI_COMM_WORLD, &requests[0]);
+            // x0(:, 1)    -> south
             MPI_Isend(x0+nx, nx, MPI_DOUBLE, south, 0, MPI_COMM_WORLD, &requests[1]);
             num_requests+=2;
         }
 
         // exchange with north
         if(north<mpi_size) {
+            // x0(:, ny-1) <- north
             MPI_Irecv(x0+(ny-1)*nx, nx, MPI_DOUBLE, north, 0, MPI_COMM_WORLD, &requests[num_requests]);
+            // x0(:, ny-2) -> north
             MPI_Isend(x0+(ny-2)*nx, nx, MPI_DOUBLE, north, 0, MPI_COMM_WORLD, &requests[num_requests+1]);
             num_requests+=2;
         }
 
         MPI_Waitall(num_requests, requests, statuses);
-        // TODO perform halo exchange
-        // x0(:, ny-1) <- north
-        // x0(:, ny-2) -> north
 
         // TODO copy in the kernel launch from diffusion2d.cu
         diffusion<<<grid_dim, block_dim>>>(x0, x1, nx, ny, dt);

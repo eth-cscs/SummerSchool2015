@@ -22,8 +22,8 @@ Quick start on daint:
     [Note: you will see a difference due the job number. This could be fix with more bash scripting]
 
 5. Run your own experiments
-    aprun -n 4 ./main -nx 99 -ny 88 -ts_monitor -snes_monitor -ksp_monitor -dump 1
-    aprun -n 1 ./main -nx 16 -ny 16 -ts_monitor -snes_monitor -ksp_monitor -assemble 1 -pc_type gamg
+    aprun -n 4 ./main -nx 99 -ny 88 -ts_monitor -snes_monitor -ksp_monitor 
+    aprun -n 1 ./main -nx 16 -ny 16 -ts_monitor -snes_monitor -ksp_monitor -assemble 1 -pc_type gamg -dump 1
 
 To view the .bov file that is generated (only for single-processor runs with the -dump option), we borrow the procedure from the miniapp
     module load python/2.7.6

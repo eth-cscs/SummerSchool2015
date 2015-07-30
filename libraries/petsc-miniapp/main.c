@@ -48,10 +48,11 @@ int main(int argc,char **argv)
      KSP  : linear solver (e.g. Conjugate Gradients)
      Mat  : operator (e.g. diffusion stencil, or matrix multiply)
      Vec  : (distributed) vector (e.g. field on a domain)
+     DM   : (distributed) domain manager (e.g. 2D grid)
      
      *It can of course be called from C++, and provides a Fortran 
      interface. */
-  PetscErrorCode ierr; /*PETSc provides lightweight error checking */
+  PetscErrorCode ierr; /* PETSc provides lightweight error checking and handling */
   AppCtx         ctx;
   DM             da;   
   TS             ts;
@@ -60,7 +61,7 @@ int main(int argc,char **argv)
   Mat            J;
   Vec            u;
   PetscInt       nt=100;
-  PetscReal      t=0.01,h;
+  PetscReal      t=0.01;
   PetscBool      assemble_jacobian=PETSC_FALSE, dump=PETSC_FALSE;
 
   /* Initialize PETSc, which initializes MPI if it has not already been,

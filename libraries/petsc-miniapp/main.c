@@ -4,10 +4,12 @@ Adapted to use PETSc by Patrick Sanan, from code by Ben Cumming and Gilles Foure
 
 This code is heavily commented for the newcomer.
 
-usage:
+usage if you are using your own PETSc build:
 $PETSC_DIR/bin/petscmpiexec -n <numprocs> ./main -nx <nx> -ny <ny> -nt <nt> -t <t> [-dump 1] [-assemble 1]
+[Note that you should have PETSC_DIR and PETSC_ARCH defined in your environment in this case]
 
-[Note that you should have PETSC_DIR and PETSC_ARCH defined in your environment]
+if using the cray-petsc module, run as any other mpi code, using aprun
+
 *******************************************/
 
 static char help[] = "Time-stepping for a nonlinear 2D Diffusion Equation, in parallel.\n\
@@ -24,11 +26,12 @@ Available options:\n\
 #include <petscdmda.h>
 
 /* An Application Context
- 
- */
+   This provides a way to pass information aboout the problem to solvers and
+   other routines, without the overhead of C++
+*/
 #include "appctx.h"
 
-/* Functions defined in system.c */
+/* Functions defined in other compilation units */
 extern PetscErrorCode RHSFunction(TS,PetscReal,Vec,Vec,void*);
 extern PetscErrorCode RHSJacobianAssembled(TS,PetscReal,Vec,Mat,Mat,void*);
 extern PetscErrorCode InitialConditions(Vec,AppCtx*);
@@ -126,6 +129,10 @@ int main(int argc,char **argv)
   /* Set the RHS and Jacobian routines */
   ierr = TSSetRHSFunction(ts,NULL,RHSFunction,&ctx);CHKERRQ(ierr);
   if(assemble_jacobian){
+   /* For instructive purposes, we assemble the Jacobian, but in practical use
+      one would often like to simply define a function to apply it.
+      This sort of "matrix free" operator is represented in PETSc by a 
+      MatShell object */
     ierr = TSSetRHSJacobian(ts,J,J,RHSJacobianAssembled,&ctx);CHKERRQ(ierr);
   }else{
     /* Instruct the nonlinear solve to use a default finite-difference 

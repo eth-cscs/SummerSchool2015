@@ -20,10 +20,6 @@ static PetscErrorCode AssembleJacobian(Vec u,Mat J,void *ptr)
 
   PetscFunctionBeginUser;
 
-  /* Note that we do NOT require a global->local scatter here since
-     the Jacobian, unlike the RHS, does not depend on off-process
-     values of u */
-
 #ifdef USE_OLD_API
   ierr = DMDAVecGetArray(da,u,&uarr);CHKERRQ(ierr);
 #else
@@ -43,8 +39,10 @@ static PetscErrorCode AssembleJacobian(Vec u,Mat J,void *ptr)
   }
   #endif
 
-  /* Loop over global indices and set values in the matrix using the MatStencil object 
-     for convenience */
+  /* Loop over indices assigned to this rank 
+    Note that we have introduced inefficent branching into the assembly here
+    for conciseness. An obvious optimization is to treat the boundary cases separately
+    as you have done in the other exercises in this course */
   for (j=ys; j<ys+ym; j++) {
     for (i=xs; i<xs+xm; i++) {
       row.i = i; row.j = j;
@@ -135,7 +133,10 @@ PetscErrorCode RHSFunction(TS ts,PetscReal t,Vec u,Vec f,void* ptr)
   ierr  = DMDAGetInfo(da,0,&M,&N,0,0,0,0,0,0,0,0,0,0);CHKERRQ(ierr);
   ierr  = DMDAGetCorners(da,&xs,&ys,0,&xm,&ym,0);CHKERRQ(ierr);
 
-  // !! TODO this is lazy about the boundaries
+  /* Loop over indices assigned to this rank 
+    Note that we have introduced inefficent branching into the assembly here
+    for conciseness. An obvious optimization is to treat the boundary cases separately
+    as you have done in the other exercises in this course */
   for (j=ys; j<ys+ym; j++) {
     for (i=xs; i<xs+xm; i++) {
       PetscScalar val = (-(4.0 * ctx->dxinv2) + (1.0 - uarr[j][i]))*uarr[j][i]; /* nonlinearity */
@@ -177,39 +178,33 @@ PetscErrorCode InitialConditions(Vec u0,void *ptr)
   DMDACoor2d     **coords;
   PetscInt       i,j;
 
-
   PetscFunctionBeginUser;
 
-  /* Another way to get local information from a DA */
   ierr = DMDAGetLocalInfo(da,&info);CHKERRQ(ierr);
 
   /* Get Coordinate DA, which can provide the coordinates for the grid points */
   ierr = DMGetCoordinateDM(da,&cda);CHKERRQ(ierr);
   ierr = DMGetCoordinates(da,&coordinates);CHKERRQ(ierr);
   ierr = DMDAVecGetArray(cda,coordinates,&coords);CHKERRQ(ierr);
-
+ 
   ierr = DMDAVecGetArray(da,u0,&u0arr);CHKERRQ(ierr); 
-
-  /* A circle of value 0.1, 1/4 of the way across each dimension,
-    with a radius equal to half the shortest distance from the 
-    center to the boundary */
-  const PetscReal xc = 1.0 / 4.0;
-  const PetscReal yc = ((PetscReal) ctx->ny - 1) / (4.0 * (ctx->nx - 1)); 
-  const PetscReal radius = PetscMin(xc, yc) / 2.0;
-  for (j=info.ys; j<info.ys+info.ym; ++j) {
-    for (i=info.xs; i<info.xs+info.xm; ++i) {
-      const PetscReal x = coords[j][i].x; 
-      const PetscReal y = coords[j][i].y; 
-      if ((x - xc) * (x - xc) + (y - yc) * (y - yc) < radius * radius){
-        u0arr[j][i]=0.1;
-      }else{
-        u0arr[j][i]=0.0;
+    const PetscReal xc = 1.0 / 4.0;
+    const PetscReal yc = ((PetscReal) ctx->ny - 1) / (4.0 * (ctx->nx - 1)); 
+    const PetscReal radius = PetscMin(xc, yc) / 2.0;
+    for (j=info.ys; j<info.ys+info.ym; ++j) {
+      for (i=info.xs; i<info.xs+info.xm; ++i) {
+        const PetscReal x = coords[j][i].x; 
+        const PetscReal y = coords[j][i].y; 
+        if ((x - xc) * (x - xc) + (y - yc) * (y - yc) < radius * radius){
+          u0arr[j][i]=0.1;
+        }else{
+          u0arr[j][i]=0.0;
+        }
       }
     }
-  }
 
-  ierr = DMDAVecRestoreArray(da,u0,&u0arr);CHKERRQ(ierr); 
-  ierr = DMDAVecRestoreArray(cda,coordinates,&coords);CHKERRQ(ierr);
+    ierr = DMDAVecRestoreArray(da,u0,&u0arr);CHKERRQ(ierr); 
+    ierr = DMDAVecRestoreArray(cda,coordinates,&coords);CHKERRQ(ierr);
 
-  PetscFunctionReturn(0);
+    PetscFunctionReturn(0);
 }

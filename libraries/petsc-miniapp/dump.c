@@ -40,13 +40,13 @@ PetscErrorCode DumpSolution(DM da, Vec u, AppCtx * ctx)
   ierr = DMDAVecGetArrayRead(da,u,&uarr);CHKERRQ(ierr);
 #endif
 
+  /* Output a .bov file (only one a single process) */
   {
     FILE* output = fopen("output.bin", "w");
     fwrite(*uarr, sizeof(PetscScalar), ctx->nx * ctx->ny, output);
     fclose(output);
   }
 
-  // metadata
   {
     FILE* output = fopen("output.bov", "wb");
     fprintf(output, "TIME: 0.0\n");
@@ -59,17 +59,7 @@ PetscErrorCode DumpSolution(DM da, Vec u, AppCtx * ctx)
     fprintf(output, "BRICK_SIZE: 1.0 %f 1.0\n", (ctx->ny - 1.0) / (ctx->nx - 1.0));
     fclose(output);
   }
-  /*
-    std::ofstream fid("output.bov");
-    fid << "TIME: 0.0" << std::endl;
-    fid << "DATA_FILE: output.bin" << std::endl;
-    fid << "DATA_SIZE: " << options.nx << ", " << options.ny << ", 1" << std::endl;;
-    fid << "DATA_FORMAT: DOUBLE" << std::endl;
-    fid << "VARIABLE: phi" << std::endl;
-    fid << "DATA_ENDIAN: LITTLE" << std::endl;
-    fid << "CENTERING: nodal" << std::endl;
-    fid << "BRICK_SIZE: 1.0 " << (options.ny-1)*options.dx << " 1.0" << std::endl;
-    */
+
 #ifdef USE_OLD_API
   ierr = DMDAVecRestoreArray(da,u,&uarr);CHKERRQ(ierr);
 #else

@@ -29,22 +29,22 @@ TEST_OPTIONS=-ts_monitor -snes_monitor -ksp_monitor -ts_view
 run_test1: ${EXNAME}
 	@rm -f test1.tmp
 	@echo "\033[34mRunning Test 1\033[0m"
-	@${MPIEXEC} -n 1 ./${EXNAME} ${TEST_OPTS}  \
+	@${MPIEXEC} -n 1 ./${EXNAME} ${TEST_OPTIONS}  \
     2>&1 > test1.tmp
 	@diff test1.tmp testref/test1.ref && \
     echo "\033[32mSuccess\033[0m" || \
     echo "\033[31mFailure: output does not match reference (see diff above)\033[0m"
-	#@rm -f test1.tmp
+	@rm -f test1.tmp
 
 run_test2: ${EXNAME}
 	@rm -f test2.tmp
 	@echo "\033[34mRunning Test 2\033[0m"
-	@${MPIEXEC} -n 2 ./${EXNAME} ${TEST_OPTS}  \
+	@${MPIEXEC} -n 2 ./${EXNAME} ${TEST_OPTIONS}  \
     2>&1 > test2.tmp
 	@diff test2.tmp testref/test2.ref && \
     echo "\033[32mSuccess\033[0m" || \
     echo "\033[31mFailure: output does not match reference (see diff above)\033[0m"
-	#@rm -f test2.tmp
+	@rm -f test2.tmp
 
 .PHONY: ALL allclean test run_test1 run_test2
 

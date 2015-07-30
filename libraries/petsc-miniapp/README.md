@@ -19,6 +19,7 @@ Quick start on daint:
     make test
 
     [Note: you can also modify the included job.daint and submit with sbatch]
+    [Note: you will see a difference due the job number. This could be fix with more bash scripting]
 
 5. Run your own experiments
     aprun -n 4 ./main -nx 99 -ny 88 -ts_monitor -snes_monitor -ksp_monitor -dump 1

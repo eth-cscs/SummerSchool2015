@@ -25,7 +25,7 @@ Quick start on daint:
     aprun -n 4 ./main -nx 99 -ny 88 -ts_monitor -snes_monitor -ksp_monitor -dump 1
     aprun -n 1 ./main -nx 16 -ny 16 -ts_monitor -snes_monitor -ksp_monitor -assemble 1 -pc_type gamg
 
-To view the .bov file that is generated (only for single-processor runs), we borrow the procedure from the miniapp
+To view the .bov file that is generated (only for single-processor runs with the -dump option), we borrow the procedure from the miniapp
     module load python/2.7.6
     python plotting.py
     display output.png [make sure that you used ssh -X to log in]

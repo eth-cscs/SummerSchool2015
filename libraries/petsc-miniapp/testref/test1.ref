@@ -1592,4 +1592,3 @@ TS Object: 1 MPI processes
             err=1.49012e-08 (relative error in function evaluation)
             Using wp compute h routine
                 Does not compute normU
-Application 5328646 resources: utime ~1s, stime ~0s, Rss ~13892, inblocks ~59845, outblocks ~184525

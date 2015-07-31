@@ -39,7 +39,7 @@ run_test2: ${EXNAME}
 	@echo "Running Test 2"
 	@aprun -n 2 ./main ${TEST_OPTIONS}  \
     2>&1 > test2.tmp
-	@diff test2.tmp testref/test2.ref && \
+	@diff <sed ('/Applicaton * resources:/d' test2.tmp) testref/test2.ref && \
     echo "Success" || \
     echo "Check: output does not match reference (see diff above)"
 	@rm -f test2.tmp

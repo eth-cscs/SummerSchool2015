@@ -7,7 +7,6 @@
 PetscErrorCode DumpSolution(DM da, Vec u, AppCtx * ctx)
 {
   PetscErrorCode ierr;
-  PetscViewer    viewer;
   PetscScalar    **uarr;
   PetscMPIInt    size;
 
@@ -28,10 +27,13 @@ PetscErrorCode DumpSolution(DM da, Vec u, AppCtx * ctx)
      This respects any name give to the vector, so in this case,
      the result is a file which can be run from octave or MATLAB
      to define "u", since we assigned that name to this object in main.c */
-  ierr = PetscViewerASCIIOpen(PETSC_COMM_WORLD,"out.m",&viewer);CHKERRQ(ierr);
-  ierr = PetscViewerSetFormat(viewer,PETSC_VIEWER_ASCII_MATLAB);CHKERRQ(ierr);
-  ierr = VecView(u,viewer);CHKERRQ(ierr);
-  PetscViewerDestroy(&viewer);CHKERRQ(ierr);
+  {
+    PetscViewer viewer;
+    ierr = PetscViewerASCIIOpen(PETSC_COMM_WORLD,"out.m",&viewer);CHKERRQ(ierr);
+    ierr = PetscViewerSetFormat(viewer,PETSC_VIEWER_ASCII_MATLAB);CHKERRQ(ierr);
+    ierr = VecView(u,viewer);CHKERRQ(ierr);
+    PetscViewerDestroy(&viewer);CHKERRQ(ierr);
+  }
   #endif
 
 #ifdef USE_OLD_API

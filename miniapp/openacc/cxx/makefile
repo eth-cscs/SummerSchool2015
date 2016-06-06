@@ -1,42 +1,57 @@
-CC=cc
-CCFLAGS=
-ifeq ($(PE_ENV),PGI)
-	# -Minfo outputs extra diagnostic information
-	# -hacc generates accelerated kernels from openacc directives
-	CCFLAGS  = -acc=verystrict
-	CCFLAGS += -ta=nvidia,nofma,cc35,cuda5.5 # target architecture
-	#CCFLAGS  = -Minfo=accel
-	CCFLAGS += -g # debug flags
+.PHONY: all clean
+.DEFAULT: all
+
+# by default select gcc
+CXX      = g++
+CXXFLAGS = -g -O3 -fopenmp
+MKDIR_P  = mkdir -p
+RM       = /bin/rm
+
+# if on a cray system, set flags according to the compilation enviroment
+ifeq ($(PE_ENV), GNU)
+	CXX=CC
+	CXXFLAGS=-g -O3 -fopenmp
 endif
-ifeq ($(PE_ENV),CRAY)
-	# -h list=md outputs extra diagnostic files
-	# -hacc generates accelerated kernels from openacc directives
-	CCFLAGS  = -h list=md -hacc -O3
+ifeq ($(PE_ENV), CRAY)
+	CXX = CC
+	CXXFLAGS = -O3 -hstd=c++11 -hacc -homp -dynamic
+	ifeq ($(VERBOSE), 1)
+		CXXFLAGS += -hmsgs
+	endif
+endif
+ifeq ($(PE_ENV), INTEL)
+	CXX = CC
+	CXXFLAGS = -g -O3 -openmp
+endif
+ifeq ($(PE_ENV), PGI)
+	CXX = CC
+	CXXFLAGS = -g -std=c++11 -O3 -mp -acc
+	ifeq ($(VERBOSE), 1)
+		CXXFLAGS += -Minfo=accel
+	endif
 endif
 
-SOURCES = stats.c data.c operators.c linalg.c
-HEADERS = stats.h   data.h   operators.h   linalg.h
-OBJ     = stats.o   data.o   operators.o   linalg.o   main.o
+PROGRAM = main
+SOURCES = stats.cpp data.cpp operators.cpp linalg.cpp main.cpp
+OBJ     = $(SOURCES:%.cpp=%.o)
 
-all: main
+all: $(PROGRAM)
 
-stats.o: stats.c stats.h
-	$(CC) $(CCFLAGS) -c stats.c -o stats.o
+DEPDIR = .deps
+df = $(DEPDIR)/$(*D)/$(*F)
+%.o: %.cpp
+	@$(MKDIR_P) $(DEPDIR)/$(*D)
+	$(CXX) $(CXXFLAGS) $(IFLAGS) -c -MMD -o $@ $<
+	@cp $*.d $(df).P; \
+	sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
+		-e '/^$$/ d' -e 's/$$/ :/' < $*.d >> $(df).P; \
+	$(RM) -f $*.d
 
-data.o: data.c data.h
-	$(CC) $(CCFLAGS) -c data.c -o data.o
-
-operators.o: operators.c operators.h
-	$(CC) $(CCFLAGS) -c operators.c -o operators.o
-
-linalg.o: linalg.c linalg.h
-	$(CC) $(CCFLAGS) -c linalg.c -o linalg.o
-
-main.o: main.c $(HEADERS)
-	$(CC) $(CCFLAGS) -c $< -o $@
+-include $(SOURCES:%.cpp=$(DEPDIR)/%.P)
 
 main: $(OBJ)
-	$(CC) $^ -o $@ 
+	$(CXX) $(CXXFLAGS) $(OBJ) -o $@ $(LDFLAGS)
 
 clean:
-	rm -f main *.o *.i *.ptx *.bin *.gpu *.lst *.cg *.opt
+	$(RM) -rf $(DEPDIR)
+	$(RM) -f $(OBJ) $(PROGRAM) *.i *.lst output.*

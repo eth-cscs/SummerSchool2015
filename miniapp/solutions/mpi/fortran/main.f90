@@ -306,8 +306,9 @@ subroutine initialize_mpi(options, domain)
     integer     :: periods(2)
     integer     :: coords(2)
     integer     :: comm_cart
+    integer     :: threadLevelProvided
 
-    call mpi_init(err)
+    call mpi_init_thread(MPI_THREAD_FUNNELED, threadLevelProvided, ierr)
     call mpi_comm_size(MPI_COMM_WORLD, mpi_size, ierr)
     call mpi_comm_rank(MPI_COMM_WORLD, mpi_rank, ierr)
 

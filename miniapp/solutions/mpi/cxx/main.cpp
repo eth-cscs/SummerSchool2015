@@ -135,8 +135,8 @@ int main(int argc, char* argv[])
     readcmdline(options, argc, argv);
 
     // initialize MPI
-    int mpi_rank, mpi_size;
-    if( MPI_Init(&argc, &argv) != MPI_SUCCESS ) {
+    int mpi_rank, mpi_size, threadLevelProvided;
+    if( MPI_Init_thread(&argc, &argv, MPI_THREAD_FUNNELED, &threadLevelProvided) != MPI_SUCCESS ) {
         std::cerr << "unable to initialize MPI :: exitting" << std::endl;
         exit(-1);
     }
@@ -160,7 +160,7 @@ int main(int argc, char* argv[])
     if( domain.rank == 0 ) {
         std::cout << "========================================================================" << std::endl;
         std::cout << "                      Welcome to mini-stencil!" << std::endl;
-        std::cout << "version   :: CUDA with MPI : " << domain.size << " MPI ranks" << std::endl;
+        std::cout << "version   :: OpenMP with MPI : " << domain.size << " MPI ranks" << std::endl;
         std::cout << "mesh      :: " << options.nx << " * " << options.ny << " dx = " << options.dx << std::endl;
         std::cout << "time      :: " << nt << " time steps from 0 .. " << options.nt*options.dt << std::endl;;
         std::cout << "iteration :: " << "CG "          << max_cg_iters

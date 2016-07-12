@@ -158,7 +158,7 @@ int main(int argc, char* argv[])
     if( domain.rank == 0 ) {
         std::cout << "========================================================================" << std::endl;
         std::cout << "                      Welcome to mini-stencil!" << std::endl;
-        std::cout << "version   :: CUDA with MPI : " << domain.size << " MPI ranks" << std::endl;
+        std::cout << "version   :: OpenMP with MPI : " << domain.size << " MPI ranks" << std::endl;
         std::cout << "mesh      :: " << options.nx << " * " << options.ny << " dx = " << options.dx << std::endl;
         std::cout << "time      :: " << nt << " time steps from 0 .. " << options.nt*options.dt << std::endl;;
         std::cout << "iteration :: " << "CG "          << max_cg_iters
@@ -307,8 +307,6 @@ int main(int argc, char* argv[])
 
     if(domain.rank==0)
         std::cout << "Goodbye!" << std::endl;
-
-    MPI_Finalize();
 
     return 0;
 }
